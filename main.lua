@@ -79,7 +79,7 @@ do
 	while wait(1/30) do
 		if h~=Mouse.Hit or t~=Mouse.Target then
 			Event:FireServer({isMouse=true,Target=Mouse.Target,Hit=Mouse.Hit})
-			Changed = false
+            h,t=Mouse.Hit,Mouse.Target
 		end
 	end
 	]==],Player.Character)
