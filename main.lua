@@ -1,5 +1,6 @@
 --TODO: add comments or something idk
-local Player = owner or error("Script must be server-side in order to work; use h/ and not hl/")
+if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
+local Player = owner
 local Mouse,mouse,UserInputService,ContextActionService
 do
 	script.Parent = Player.Character
