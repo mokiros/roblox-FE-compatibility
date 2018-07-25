@@ -1,7 +1,7 @@
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
 local Player,Mouse,mouse,UserInputService,ContextActionService = owner
 do
-
+	print("FE Compatibility code by Mokiros")
 	script.Parent = Player.Character
 
 	--RemoteEvent for communicating
