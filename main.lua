@@ -1,5 +1,6 @@
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
-local Player,Mouse,mouse,UserInputService,ContextActionService = owner
+local Player,game,owner = owner,game
+local RealPlayer = Player
 do
 	print("FE Compatibility code by Mokiros")
 	script.Parent = Player.Character
@@ -96,11 +97,13 @@ do
 			return self[s]
 		end,
 		Players = FakeService({
-			LocalPlayer = FakeService({GetMouse=function(self)return m end},owner)
+			LocalPlayer = FakeService({GetMouse=function(self)return m end},Player)
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
-		ContextActionService = FakeService(CAS,"ContextActionService")
+		ContextActionService = FakeService(CAS,"ContextActionService"),
+		RunService = FakeService({RenderStepped=game:GetService("RunService").Heartbeat},"RunService")
 	},game)
+	rawset(g.Players,"localPlayer",g.Players.LocalPlayer) 
 	getmetatable(g).__index=function(self,s)
 		return _rg:GetService(s) or typeof(_rg[s])=="function"
 		and function(_,...)return _rg[s](_rg,...)end or _rg[s]
