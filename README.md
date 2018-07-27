@@ -10,3 +10,6 @@ Note: some scripts require additional editing, for example scripts that parent i
 In that case, use RealPlayer to parent to an actual player object.
 
 It's recommended to use main-min.lua (minified file), because it takes less space and contains no comments.
+
+If you have any questions/problems, post an issue:
+https://github.com/Mokiros/roblox-FE-compatibility/issues/new
