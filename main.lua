@@ -83,7 +83,7 @@ do
 		t._RealService = typeof(RealService)=="string" and _rg:GetService(RealService) or RealService
 		return setmetatable(t,{
 			__index = function(self,k)
-					local s = rawget(self,"_RealService")
+				local s = rawget(self,"_RealService")
 				if s then return s[k] end
 			end,
 			__newindex = function(self,k,v)
@@ -92,7 +92,7 @@ do
 			end,
 		})
 	end
-	local g = setmetatable({
+	local g = FakeService({
 		GetService = function(self,s)
 			return self[s]
 		end,
@@ -101,10 +101,11 @@ do
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService")
-	},{__index=function(self,s)
+	},game)
+	getmetatable(g).__index=function(self,s)
 		return _rg:GetService(s) or typeof(_rg[s])=="function"
-				and function(_,...)return _rg[s](_rg,...)end end
-	})
+		and function(_,...)return _rg[s](_rg,...)end or _rg[s]
+	end
 	game = g
 	owner = g.Players.LocalPlayer
 end
