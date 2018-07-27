@@ -96,7 +96,7 @@ do
 			return self[s]
 		end,
 		Players = FakeService({
-			LocalPlayer = FakeService({GetMouse=function(self)return Mouse end},owner)
+			LocalPlayer = FakeService({GetMouse=function(self)return m end},owner)
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService")
