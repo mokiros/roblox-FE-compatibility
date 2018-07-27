@@ -79,7 +79,7 @@ do
 		end
 	end]==],Player.Character)
 	local function FakeService(t,RealService)
-		t._RealService = typeof(RealService)=="string" and game:GetService(RealService) or RealService
+		t._RealService = typeof(RealService)=="string" and _rg:GetService(RealService) or RealService
 		return setmetatable(t,{
 			__index = function(self,k)
 				local s = rawget(self,"_RealService")
