@@ -36,10 +36,9 @@ do
 
 	Event.OnServerEvent:Connect(function(plr,io)
 	    if plr~=Player then return end
-		if io.isMouse then
-			m.Target = io.Target
-			m.Hit = io.Hit
-		else
+		m.Target = io.Target
+		m.Hit = io.Hit
+		if not io.isMouse then
 			local b = io.UserInputState == Enum.UserInputState.Begin
 			if io.UserInputType == Enum.UserInputType.MouseButton1 then
 				return m:TrigEvent(b and "Button1Down" or "Button1Up")
@@ -59,16 +58,16 @@ do
 	local Player = game:GetService("Players").LocalPlayer
 	local Event = script:WaitForChild("UserInput_Event")
 
+	local Mouse = Player:GetMouse()
 	local UIS = game:GetService("UserInputService")
 	local input = function(io,a)
 		if a then return end
 		--Since InputObject is a client-side instance, we create and pass table instead
-		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState})
+		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState,Hit=Mouse.Hit,Target=Mouse.Target)
 	end
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
 
-	local Mouse = Player:GetMouse()
 	local h,t
 	--Give the server mouse data 30 times every second, but only if the values changed
 	--If player is not moving their mouse, client won't fire events
