@@ -78,5 +78,29 @@ do
 			Event:FireServer({isMouse=true,Target=t,Hit=h})
 		end
 	end]==],Player.Character)
-	Mouse,mouse,UserInputService,ContextActionService = m,m,UIS,CAS
+	local function FakeService(t,RealService)
+		t._RealService = typeof(RealService)=="string" and game:GetService(RealService) or RealService
+		return setmetatable(t,{
+			__index = function(self,k)
+				local s = rawget(self,"_RealService")
+				if s then return s[k] end
+			end,
+			__newindex = function(self,k,v)
+				local s = rawget(self,"_RealService")
+				if s then s[k]=v end
+			end,
+		})
+	end
+	local _rg = game
+	local g = setmetatable({
+		GetService = function(self,s)
+			return self[s]
+		end,
+		Players = FakeService({
+			LocalPlayer = FakeService({GetMouse=function(self)return Mouse end},owner)
+		},"Players"),
+		UserInputService = FakeService(UIS,"UserInputService"),
+		ContextActionService = FakeService(CAS,"ContextActionService")
+	},{__index=function(self,s)return _rg:GetService(s) end})
+	game = g
 end
