@@ -78,24 +78,32 @@ do
 			Event:FireServer({isMouse=true,Target=t,Hit=h})
 		end
 	end]==],Player.Character)
+
+	----Sandboxed game object that allows the usage of client-side methods and services
+	--Real game object
 	local _rg = game
+
+	--Metatable for fake service
+	local fsmt = {
+		__index = function(self,k)
+			local s = rawget(self,"_RealService")
+			if s then return s[k] end
+		end,
+		__newindex = function(self,k,v)
+			local s = rawget(self,"_RealService")
+			if s then s[k]=v end
+		end,
+		__call = function(self,...)
+			local s = rawget(self,"_RealService")
+			if s then return s(...) end
+		end
+	}
 	local function FakeService(t,RealService)
 		t._RealService = typeof(RealService)=="string" and _rg:GetService(RealService) or RealService
-		return setmetatable(t,{
-			__index = function(self,k)
-				local s = rawget(self,"_RealService")
-				if s then return s[k] end
-			end,
-			__newindex = function(self,k,v)
-				local s = rawget(self,"_RealService")
-				if s then s[k]=v end
-			end,
-			__call = function(self,...)
-				local s = rawget(self,"_RealService")
-				if s then return s(...) end
-			end
-		})
+		return setmetatable(t,fsmt)
 	end
+
+	--Fake game object
 	local g = FakeService({
 		GetService = function(self,s)
 			return self[s]
@@ -105,14 +113,24 @@ do
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService"),
-		RunService = FakeService({RenderStepped=game:GetService("RunService").Heartbeat},"RunService")
 	},game)
 	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
 	rawset(g,"service",g.GetService)
+	
+	g.RunService = {
+		RenderStepped = game:GetService("RunService").Heartbeat,
+		BindToRenderStep = function(self,name,_,fun)
+			self._btrs[name] = g.RunService.Heartbeat:Connect(fun)
+		end,
+		UnbindFromRenderStep = function(self,name)
+			self._btrs[name]:Disconnect()
+		end,
+	}
+
 	getmetatable(g).__index=function(self,s)
 		return _rg:GetService(s) or typeof(_rg[s])=="function"
 		and function(_,...)return _rg[s](_rg,...)end or _rg[s]
 	end
-	game = g
-	owner = g.Players.LocalPlayer
+	--Changing owner to fake player object to support owner:GetMouse()
+	game,owner = g,g.Players.LocalPlayer
 end
