@@ -90,6 +90,10 @@ do
 				local s = rawget(self,"_RealService")
 				if s then s[k]=v end
 			end,
+			__call = function(self,...)
+				local s = rawget(self,"_RealService")
+				if s then return s(...) end
+			end
 		})
 	end
 	local g = FakeService({
@@ -103,7 +107,8 @@ do
 		ContextActionService = FakeService(CAS,"ContextActionService"),
 		RunService = FakeService({RenderStepped=game:GetService("RunService").Heartbeat},"RunService")
 	},game)
-	rawset(g.Players,"localPlayer",g.Players.LocalPlayer) 
+	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
+	rawset(g,"service",g.GetService)
 	getmetatable(g).__index=function(self,s)
 		return _rg:GetService(s) or typeof(_rg[s])=="function"
 		and function(_,...)return _rg[s](_rg,...)end or _rg[s]
