@@ -63,7 +63,7 @@ do
 	local input = function(io,a)
 		if a then return end
 		--Since InputObject is a client-side instance, we create and pass table instead
-		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState,Hit=Mouse.Hit,Target=Mouse.Target)
+		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState,Hit=Mouse.Hit,Target=Mouse.Target})
 	end
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
