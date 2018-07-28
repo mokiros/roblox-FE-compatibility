@@ -113,12 +113,12 @@ do
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService"),
-	},game)
+	},_rg)
 	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
 	rawset(g,"service",g.GetService)
 	
 	g.RunService = {
-		RenderStepped = game:GetService("RunService").Heartbeat,
+		RenderStepped = _rg:GetService("RunService").Heartbeat,
 		BindToRenderStep = function(self,name,_,fun)
 			self._btrs[name] = g.RunService.Heartbeat:Connect(fun)
 		end,
