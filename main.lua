@@ -117,15 +117,15 @@ do
 	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
 	rawset(g,"service",g.GetService)
 	
-	g.RunService = {
+	g.RunService = FakeService({
 		RenderStepped = _rg:GetService("RunService").Heartbeat,
 		BindToRenderStep = function(self,name,_,fun)
-			self._btrs[name] = g.RunService.Heartbeat:Connect(fun)
+			self._btrs[name] = self.Heartbeat:Connect(fun)
 		end,
 		UnbindFromRenderStep = function(self,name)
 			self._btrs[name]:Disconnect()
 		end,
-	}
+	},"RunService")
 
 	getmetatable(g).__index=function(self,s)
 		return _rg:GetService(s) or typeof(_rg[s])=="function"
