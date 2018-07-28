@@ -11,7 +11,7 @@ do
 
 	--Fake event to make stuff like Mouse.KeyDown work
 	local function fakeEvent()
-		local t = {_fakeEvent=true,Connect=function(self,f)self.Function=f end}
+		local t = {_fakeEvent=true,Functions={},Connect=function(self,f)table.insert(self.Functions,f) end}
 		t.connect = t.Connect
 		return t
 	end
@@ -28,8 +28,10 @@ do
 	--This function will trigger the events that have been :Connect()'ed
 	local function te(self,ev,...)
 		local t = m[ev]
-		if t and t._fakeEvent and t.Function then
-			t.Function(...)
+		if t and t._fakeEvent then
+			for _,f in pairs(t.Functions) do
+				f(...)
+			end
 		end
 	end
 	m.TrigEvent = te
@@ -104,7 +106,7 @@ do
 	end
 
 	--Fake game object
-	local g = FakeService({
+	local g = {
 		GetService = function(self,s)
 			return self[s]
 		end,
@@ -113,9 +115,9 @@ do
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService"),
-	},_rg)
+	}
 	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
-	rawset(g,"service",g.GetService)
+	g.service = g.GetService
 	
 	g.RunService = FakeService({
 		RenderStepped = _rg:GetService("RunService").Heartbeat,
@@ -127,10 +129,14 @@ do
 		end,
 	},"RunService")
 
-	getmetatable(g).__index=function(self,s)
-		return _rg:GetService(s) or typeof(_rg[s])=="function"
-		and function(_,...)return _rg[s](_rg,...)end or _rg[s]
-	end
+	setmetatable(g,{
+		__index=function(self,s)
+			return _rg:GetService(s) or typeof(_rg[s])=="function"
+			and function(_,...)return _rg[s](_rg,...)end or _rg[s]
+		end,
+		__newindex = fsmt.__newindex,
+		__call = fsmt.__call
+	})
 	--Changing owner to fake player object to support owner:GetMouse()
 	game,owner = g,g.Players.LocalPlayer
 end
