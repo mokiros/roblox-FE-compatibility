@@ -3,8 +3,9 @@ local Player,game,owner = owner,game
 local RealPlayer = Player
 do
 	print("FE Compatibility code by Mokiros")
-	script.Parent = Player.Character
-
+	local rp = RealPlayer
+	script.Parent = rp.Character
+	
 	--RemoteEvent for communicating
 	local Event = Instance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
@@ -38,7 +39,7 @@ do
 	UIS.TrigEvent = te
 
 	Event.OnServerEvent:Connect(function(plr,io)
-	    if plr~=Player then return end
+	    if plr~=rp then return end
 		m.Target = io.Target
 		m.Hit = io.Hit
 		if not io.isMouse then
