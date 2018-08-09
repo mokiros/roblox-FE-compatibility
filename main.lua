@@ -18,7 +18,7 @@ do
 	end
 
 	--Creating fake input objects with fake variables
-    local m = {Target=nil,Hit=CFrame.new(),KeyUp=fakeEvent(),KeyDown=fakeEvent(),Button1Up=fakeEvent(),Button1Down=fakeEvent()}
+    local m = {Target=nil,Hit=CFrame.new(),KeyUp=fakeEvent(),KeyDown=fakeEvent(),Button1Up=fakeEvent(),Button1Down=fakeEvent(),Button2Up=fakeEvent(),Button2Down=fakeEvent()}
 	local UIS = {InputBegan=fakeEvent(),InputEnded=fakeEvent()}
 	local CAS = {Actions={},BindAction=function(self,name,fun,touch,...)
 		CAS.Actions[name] = fun and {Name=name,Function=fun,Keys={...}} or nil
@@ -46,6 +46,9 @@ do
 			local b = io.UserInputState == Enum.UserInputState.Begin
 			if io.UserInputType == Enum.UserInputType.MouseButton1 then
 				return m:TrigEvent(b and "Button1Down" or "Button1Up")
+			end
+			if io.UserInputType == Enum.UserInputType.MouseButton2 then
+				return m:TrigEvent(b and "Button2Down" or "Button2Up")
 			end
 			for _,t in pairs(CAS.Actions) do
 				for _,k in pairs(t.Keys) do
