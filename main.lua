@@ -94,15 +94,14 @@ do
 	local fsmt = {
 		__index = function(self,k)
 			local s = rawget(self,"_RealService")
-			if s then return s[k] end
+			if s then
+				return typeof(s[k])=="function"
+				and function(_,...)return s[k](s,...)end or s[k]
+			end
 		end,
 		__newindex = function(self,k,v)
 			local s = rawget(self,"_RealService")
 			if s then s[k]=v end
-		end,
-		__call = function(self,...)
-			local s = rawget(self,"_RealService")
-			if s then return s(...) end
 		end
 	}
 	local function FakeService(t,RealService)
@@ -134,14 +133,7 @@ do
 		end,
 	},"RunService")
 
-	setmetatable(g,{
-		__index=function(self,s)
-			return _rg:GetService(s) or typeof(_rg[s])=="function"
-			and function(_,...)return _rg[s](_rg,...)end or _rg[s]
-		end,
-		__newindex = fsmt.__newindex,
-		__call = fsmt.__call
-	})
+	setmetatable(g,fsmt)
 	--Changing owner to fake player object to support owner:GetMouse()
 	game,owner = g,g.Players.LocalPlayer
 end
