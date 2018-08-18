@@ -1,3 +1,4 @@
+--https://github.com/Mokiros/roblox-FE-compatibility
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
 local Player,game,owner = owner,game
 local RealPlayer = Player
