@@ -1,3 +1,5 @@
+Small disclaimer: This code is not 100% reliable, and it may not work for some scripts. Also I'm getting somewhat inactive both on github and script builder. If you need to contact me, my discord is Mokiros#0001, I'm always active there.
+
 How to use:
 
 0. Get main.lua or main-min.lua for minified version
