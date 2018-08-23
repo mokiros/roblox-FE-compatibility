@@ -124,6 +124,7 @@ do
 	g.service = g.GetService
 	
 	g.RunService = FakeService({
+		_btrs = {},
 		RenderStepped = _rg:GetService("RunService").Heartbeat,
 		BindToRenderStep = function(self,name,_,fun)
 			self._btrs[name] = self.Heartbeat:Connect(fun)
