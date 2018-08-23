@@ -112,29 +112,26 @@ do
 	--Fake game object
 	local g = {
 		GetService = function(self,s)
-			local a,b = pcall(function()return self[s] end)
-			return a and b or _rg:GetService(s)
+			return rawget(self,s) or _rg:GetService(s)
 		end,
 		Players = FakeService({
 			LocalPlayer = FakeService({GetMouse=function(self)return m end},Player)
 		},"Players"),
 		UserInputService = FakeService(UIS,"UserInputService"),
 		ContextActionService = FakeService(CAS,"ContextActionService"),
+		RunService = FakeService({
+			_btrs = {},
+			RenderStepped = _rg:GetService("RunService").Heartbeat,
+			BindToRenderStep = function(self,name,_,fun)
+				self._btrs[name] = self.Heartbeat:Connect(fun)
+			end,
+			UnbindFromRenderStep = function(self,name)
+				self._btrs[name]:Disconnect()
+			end,
+		},"RunService")
 	}
 	rawset(g.Players,"localPlayer",g.Players.LocalPlayer)
 	g.service = g.GetService
-	
-	g.RunService = FakeService({
-		_btrs = {},
-		RenderStepped = _rg:GetService("RunService").Heartbeat,
-		BindToRenderStep = function(self,name,_,fun)
-			self._btrs[name] = self.Heartbeat:Connect(fun)
-		end,
-		UnbindFromRenderStep = function(self,name)
-			self._btrs[name]:Disconnect()
-		end,
-	},"RunService")
-
 	FakeService(g,game)
 	--Changing owner to fake player object to support owner:GetMouse()
 	game,owner = g,g.Players.LocalPlayer
