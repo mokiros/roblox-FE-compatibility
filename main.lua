@@ -112,7 +112,8 @@ do
 	--Fake game object
 	local g = {
 		GetService = function(self,s)
-			return self[s]
+			local a,b = pcall(function()return self[s] end)
+			return a and b or _rg:GetService(s)
 		end,
 		Players = FakeService({
 			LocalPlayer = FakeService({GetMouse=function(self)return m end},Player)
@@ -134,7 +135,7 @@ do
 		end,
 	},"RunService")
 
-	setmetatable(g,fsmt)
+	FakeService(g,game)
 	--Changing owner to fake player object to support owner:GetMouse()
 	game,owner = g,g.Players.LocalPlayer
 end
