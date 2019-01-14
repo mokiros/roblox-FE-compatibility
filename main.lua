@@ -2,6 +2,7 @@
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
 local Player,game,owner = owner,game
 local RealPlayer = Player
+local RealInstance,Instance = Instance
 do
 	print("FE Compatibility code V2 by Mokiros")
 	local RealPlayer = RealPlayer
@@ -47,8 +48,11 @@ do
 	FakeMouse.TriggerEvent = TriggerEvent
 	UIS.TriggerEvent = TriggerEvent
 
+	--Sounds with PlaybackLoudness
+	local PL_List = {}
+
 	--Client communication
-	local Event = Instance.new("RemoteEvent")
+	local Event = RealInstance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
 	Event.OnServerEvent:Connect(function(plr,io)
 	    if plr~=RealPlayer then return end
@@ -72,6 +76,11 @@ do
 			FakeMouse:TriggerEvent(b and "KeyDown" or "KeyUp",io.KeyCode.Name:lower())
 			UIS:TriggerEvent(b and "InputBegan" or "InputEnded",io,false)
 	    end
+	    if io.PL_List then
+	    	for i,c in pairs(io.PL_List) do
+	    		rawset(PL_List[i],"PlaybackLoudness",c)
+	    	end
+	    end
 	end)
 	Event.Parent = NLS([==[local Event = script:WaitForChild("UserInput_Event")
 	local Mouse = owner:GetMouse()
@@ -84,14 +93,29 @@ do
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
 
+	--PlaybackLoudness stuff
+	local PL_List = {}
+	Event.OnClientEvent:Connect(function(sound)
+		table.insert(PL_List,sound)
+	end)
+
 	local h,t
 	--Give the server mouse data every second frame, but only if the values changed
 	--If player is not moving their mouse, client won't fire events
 	local HB = game:GetService("RunService").Heartbeat
 	while true do
+		local PL
+		if #PL_List>0 then
+			PL = {}
+			for i,s in pairs(PL_List) do
+				if s.IsPlaying then
+					PL[i] = s.PlaybackLoudness
+				end
+			end
+		end
 		if h~=Mouse.Hit or t~=Mouse.Target then
 			h,t=Mouse.Hit,Mouse.Target
-			Event:FireServer({isMouse=true,Target=t,Hit=h})
+			Event:FireServer({isMouse=true,Target=t,Hit=h,PL_List=PL})
 		end
 		--Wait 2 frames
 		for i=1,2 do
@@ -148,4 +172,33 @@ do
 	FakeService(FakeGame,game)
 	--Changing owner to fake player object to support owner:GetMouse()
 	game,owner = FakeGame,FakeGame.Players.LocalPlayer
+
+	--Custom Instance.new to support PlaybackLoudness
+	--Since it replaces Sound with regular table, parenting something to it will produce an error
+	local Sound_Metatable = {
+		__index = function(self,k)
+			if k=="PlaybackLoudness" then
+				table.insert(PL_List,self)
+				Event:FireClient(RealPlayer,rawget(self,"Real"))
+				rawset(self,"PlaybackLoudness",0)
+				return 0
+			else
+				local RealSound = rawget(self,"Real")
+				return typeof(RealSound[k])=="function"
+				and function(_,...)return RealSound[k](RealSound,...)end or RealSound[k]
+			end
+		end,
+		__newindex = function(self,k,v)
+			rawget(self,"Real")[k] = v
+		end
+	}
+	Instance = {
+		new = function(ClassName,Parent)
+			if ClassName=="Sound" then
+				return setmetatable({Real=RealInstance.new(ClassName,Parent)},Sound_Metatable)
+			else
+				return RealInstance.new(ClassName,Parent)
+			end
+		end
+	}
 end
