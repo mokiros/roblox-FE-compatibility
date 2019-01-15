@@ -1,5 +1,21 @@
 --https://github.com/Mokiros/roblox-FE-compatibility
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
+local succ,env = pcall(function() return require(2084649733) end)
+if succ and env then
+	local n = tostring(math.random())
+	local old_name = script.Name
+	script.Name = n
+	env.old_env = getfenv(1)
+	env.print = print
+	env.warn = warn
+	env.error = error
+	env.owner = env.game:GetService("Players"):FindFirstChild(owner.Name)
+	setfenv(1,env)
+	script = workspace:FindFirstChild(n) or error("Script not found")
+	script.Name = old_name
+else
+	old_env = getfenv(1)
+end
 local Player,game,owner = owner,game
 local RealPlayer = Player
 do
@@ -48,13 +64,15 @@ do
 	UIS.TriggerEvent = TriggerEvent
 
 	--Client communication
-	local Event = Instance.new("RemoteEvent")
+	local Event = old_env.Instance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
 	Event.OnServerEvent:Connect(function(plr,io)
-	    if plr~=RealPlayer then return end
 		FakeMouse.Target = io.Target
-		FakeMouse.Hit = io.Hit
+		FakeMouse.Hit = CFrame.new(io.Hit:components())
 		if not io.isMouse then
+			io.UserInputState = Enum.UserInputState[io.UserInputState]
+			io.UserInputType = Enum.UserInputType[io.UserInputType]
+			io.KeyCode = Enum.KeyCode[io.KeyCode]
 			local b = io.UserInputState == Enum.UserInputState.Begin
 			if io.UserInputType == Enum.UserInputType.MouseButton1 then
 				return FakeMouse:TriggerEvent(b and "Button1Down" or "Button1Up")
@@ -73,17 +91,16 @@ do
 			UIS:TriggerEvent(b and "InputBegan" or "InputEnded",io,false)
 	    end
 	end)
-	Event.Parent = NLS([==[local Event = script:WaitForChild("UserInput_Event")
+	Event.Parent = old_env.NLS([==[local Event = script:WaitForChild("UserInput_Event")
 	local Mouse = owner:GetMouse()
 	local UIS = game:GetService("UserInputService")
 	local input = function(io,RobloxHandled)
 		if RobloxHandled then return end
 		--Since InputObject is a client-side instance, we create and pass table instead
-		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState,Hit=Mouse.Hit,Target=Mouse.Target})
+		Event:FireServer({KeyCode=io.KeyCode.Name,UserInputType=io.UserInputType.Name,UserInputState=io.UserInputState.Name,Hit=Mouse.Hit,Target=Mouse.Target})
 	end
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
-
 	local h,t
 	--Give the server mouse data every second frame, but only if the values changed
 	--If player is not moving their mouse, client won't fire events
@@ -97,7 +114,7 @@ do
 		for i=1,2 do
 			HB:Wait()
 		end
-	end]==],script)
+	end]==],old_env.script)
 
 	----Sandboxed game object that allows the usage of client-side methods and services
 	--Real game object
