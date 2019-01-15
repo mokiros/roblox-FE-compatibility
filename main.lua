@@ -95,8 +95,11 @@ do
 
 	--PlaybackLoudness stuff
 	local PL_List = {}
-	Event.OnClientEvent:Connect(function(sound)
-		table.insert(PL_List,sound)
+	Event.OnClientEvent:Connect(function(inst)
+		if typeof(inst)~="Instance" then return end
+		if inst:IsA("Sound") then
+			table.insert(PL_List,sound)
+		end
 	end)
 
 	local h,t
