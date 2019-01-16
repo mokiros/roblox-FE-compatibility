@@ -1,5 +1,28 @@
---https://github.com/Mokiros/roblox-FE-compatibility
+--https://github.com/Mokiros/roblox-FE-compatibility/tree/experimental-sandbox-escape
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
+local env_module = require(2157297281)
+
+local env = require(env_module)
+local n = tostring(math.random())
+local old_name = script.Name
+script.Name = n
+env.old_env = getfenv(1)
+env.print = print
+env.warn = warn
+env.error = error
+env.owner = env.game:GetService("Players"):FindFirstChild(owner.Name)
+setfenv(1,env)
+script = workspace:FindFirstChild(n) or error("Script not found")
+script.Name = old_name
+
+do
+	local RS = game:GetService("ReplicatedStorage")
+	if not RS:FindFirstChild("Sandbox Bypass [E]") then
+		env_module.Name = "Sandbox Bypass [E]"
+		env_module.Parent = RS
+	end
+end
+
 local Player,game,owner = owner,game
 local RealPlayer = Player
 do
@@ -48,10 +71,12 @@ do
 	UIS.TriggerEvent = TriggerEvent
 
 	--Client communication
+	local ls
 	local Event = Instance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
 	Event.OnServerEvent:Connect(function(plr,io)
 	    if plr~=RealPlayer then return end
+		if ls then Event.Parent = ls ls=nil end
 		FakeMouse.Target = io.Target
 		FakeMouse.Hit = io.Hit
 		if not io.isMouse then
@@ -73,7 +98,10 @@ do
 			UIS:TriggerEvent(b and "InputBegan" or "InputEnded",io,false)
 	    end
 	end)
-	Event.Parent = NLS([==[local Event = script:WaitForChild("UserInput_Event")
+	ls = old_env.NLS([==[local env_module = game:GetService("ReplicatedStorage"):WaitForChild("Sandbox Bypass [E]",10) or error("Sandbox bypass wasn't found!")
+	setfenv(1,require(env_module))
+	local owner = game:GetService("Players").LocalPlayer
+	local Event = owner:WaitForChild("UserInput_Event",10)
 	local Mouse = owner:GetMouse()
 	local UIS = game:GetService("UserInputService")
 	local input = function(io,RobloxHandled)
@@ -83,7 +111,6 @@ do
 	end
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
-
 	local h,t
 	--Give the server mouse data every second frame, but only if the values changed
 	--If player is not moving their mouse, client won't fire events
@@ -97,8 +124,10 @@ do
 		for i=1,2 do
 			HB:Wait()
 		end
-	end]==],script)
-
+	end]==],old_env.script)
+	ls.Name = math.random()
+	ls = script:FindFirstChild(ls.Name)
+	Event.Parent = RealPlayer
 	----Sandboxed game object that allows the usage of client-side methods and services
 	--Real game object
 	local RealGame = game
