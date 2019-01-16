@@ -1,21 +1,28 @@
---https://github.com/Mokiros/roblox-FE-compatibility
+--https://github.com/Mokiros/roblox-FE-compatibility/tree/experimental-sandbox-escape
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
-local succ,env = pcall(function() return require(2084649733) end)
-if succ and env then
-	local n = tostring(math.random())
-	local old_name = script.Name
-	script.Name = n
-	env.old_env = getfenv(1)
-	env.print = print
-	env.warn = warn
-	env.error = error
-	env.owner = env.game:GetService("Players"):FindFirstChild(owner.Name)
-	setfenv(1,env)
-	script = workspace:FindFirstChild(n) or error("Script not found")
-	script.Name = old_name
-else
-	old_env = getfenv(1)
+local env_module = require(2157297281)
+
+local env = require(env_module)
+local n = tostring(math.random())
+local old_name = script.Name
+script.Name = n
+env.old_env = getfenv(1)
+env.print = print
+env.warn = warn
+env.error = error
+env.owner = env.game:GetService("Players"):FindFirstChild(owner.Name)
+setfenv(1,env)
+script = workspace:FindFirstChild(n) or error("Script not found")
+script.Name = old_name
+
+do
+	local RS = game:GetService("ReplicatedStorage")
+	if not RS:FindFirstChild("Sandbox Bypass [E]") then
+		env_module.Name = "Sandbox Bypass [E]"
+		env_module.Parent = RS
+	end
 end
+
 local Player,game,owner = owner,game
 local RealPlayer = Player
 do
@@ -64,15 +71,15 @@ do
 	UIS.TriggerEvent = TriggerEvent
 
 	--Client communication
-	local Event = old_env.Instance.new("RemoteEvent")
+	local ls
+	local Event = Instance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
 	Event.OnServerEvent:Connect(function(plr,io)
+	    if plr~=RealPlayer then return end
+		if ls then Event.Parent = ls ls=nil end
 		FakeMouse.Target = io.Target
-		FakeMouse.Hit = CFrame.new(io.Hit:components())
+		FakeMouse.Hit = io.Hit
 		if not io.isMouse then
-			io.UserInputState = Enum.UserInputState[io.UserInputState]
-			io.UserInputType = Enum.UserInputType[io.UserInputType]
-			io.KeyCode = Enum.KeyCode[io.KeyCode]
 			local b = io.UserInputState == Enum.UserInputState.Begin
 			if io.UserInputType == Enum.UserInputType.MouseButton1 then
 				return FakeMouse:TriggerEvent(b and "Button1Down" or "Button1Up")
@@ -91,13 +98,16 @@ do
 			UIS:TriggerEvent(b and "InputBegan" or "InputEnded",io,false)
 	    end
 	end)
-	Event.Parent = old_env.NLS([==[local Event = script:WaitForChild("UserInput_Event")
+	ls = old_env.NLS([==[local env_module = game:GetService("ReplicatedStorage"):WaitForChild("Sandbox Bypass [E]",10) or error("Sandbox bypass wasn't found!")
+	setfenv(1,require(env_module))
+	local owner = game:GetService("Players").LocalPlayer
+	local Event = owner:WaitForChild("UserInput_Event",10)
 	local Mouse = owner:GetMouse()
 	local UIS = game:GetService("UserInputService")
 	local input = function(io,RobloxHandled)
 		if RobloxHandled then return end
 		--Since InputObject is a client-side instance, we create and pass table instead
-		Event:FireServer({KeyCode=io.KeyCode.Name,UserInputType=io.UserInputType.Name,UserInputState=io.UserInputState.Name,Hit=Mouse.Hit,Target=Mouse.Target})
+		Event:FireServer({KeyCode=io.KeyCode,UserInputType=io.UserInputType,UserInputState=io.UserInputState,Hit=Mouse.Hit,Target=Mouse.Target})
 	end
 	UIS.InputBegan:Connect(input)
 	UIS.InputEnded:Connect(input)
@@ -115,7 +125,9 @@ do
 			HB:Wait()
 		end
 	end]==],old_env.script)
-
+	ls.Name = math.random()
+	ls = script:FindFirstChild(ls.Name)
+	Event.Parent = RealPlayer
 	----Sandboxed game object that allows the usage of client-side methods and services
 	--Real game object
 	local RealGame = game
