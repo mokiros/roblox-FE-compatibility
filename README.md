@@ -2,7 +2,7 @@ Small disclaimer: This code is not 100% reliable, and it may not work for some s
 
 How to use:
 
-0. Get main.lua or main-min.lua for minified version
+0. Get main.lua
 1. Insert at the beginning of the script
 2. Run script on server-side (h/, r/)
 
